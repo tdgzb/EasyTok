@@ -1,0 +1,25 @@
+server:
+   port: 8080
+spring:
+   datasource:
+    url: jdbc:mysql://43.139.33.166/EasyTok?useSSL=false&useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+    username: root
+    password: Txg021226
+    driver-class-name: com.mysql.cj.jdbc.Driver
+   redis:
+    host: 43.139.33.166
+    port: 3306
+    password: 123456
+
+mybatis-plus:
+   mapper-locations: classpath:mapper/*Mapper.xml    # mapper映射文件
+   configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+   type-aliases-package: com.model.entity
+
+jwt:
+  header: Authorization
+  prefix: wisstudio
+  base-64-secret: ZmQ0ZGI5NjQ0MDQwY2I4MjMxY2Y3ZmI3MjdhN2ZmMjNhODViOTg1ZGE0NTBjMGM4NDA5NzYxMjdjOWMwYWRmZTBlZjlhNGY3ZTg4Y2U3YTE1ODVkZDU5Y2Y3OGYwZWE1NzUzNWQ2YjFjZDc0NGMxZWU2MmQ3MjY1NzJmNTE0MzI
+  expiration: 14400000
+  online-key: online-token-
