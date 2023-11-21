@@ -1,7 +1,7 @@
 package com.auth;
 
 import lombok.Data;
-
+import org.springframework.stereotype.Component;
 
 
 @Data

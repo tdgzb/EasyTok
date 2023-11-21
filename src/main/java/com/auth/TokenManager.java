@@ -1,6 +1,7 @@
 package com.auth;
 
 
+import com.auth.dto.JwtUserDto;
 import com.domain.User;
 import com.utlis.RedisUtil;
 import io.jsonwebtoken.Claims;
@@ -31,12 +32,11 @@ public class TokenManager {
      * @param user 用户详情
      * @return 令牌
      */
-    public String generateToken(User user) {
+    public String generateToken(JwtUserDto user) {
         Map<String, Object> claims = new HashMap<>(16);
         //添加主体信息
         claims.put("sub", user.getUsername());
         claims.put("iat", new Date());
-        claims.put("jti",user.getId());
         return generateToken(claims);
     }
 

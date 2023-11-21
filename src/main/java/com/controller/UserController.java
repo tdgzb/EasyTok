@@ -1,16 +1,27 @@
 package com.controller;
 import com.auth.TokenManager;
+import com.auth.dto.JwtUserDto;
+import com.auth.service.AuthenticateService;
+import com.auth.vo.UserLoginVo;
+import com.auth.vo.UserVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.domain.User;
+import com.dto.UserLoginDto;
+import com.exception.BadRequestException;
 import com.result.CommonResult;
 import com.service.UserService;
-import com.model.vo.UserLoginVo;
 import com.utlis.Sha1Cipher;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.BeanUtils;
+import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description:
@@ -20,30 +31,51 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("/user")
+@CrossOrigin("*")
 public class UserController {
     @Resource
     TokenManager tokenManager;
     @Resource
     private UserService userService;
+    @Resource
+    private AuthenticateService authenticateService;
 
+
+    /**
+     * 注册
+     * @param authUserDto 前端数据对象
+     * @return 统一结果返回
+     */
     @PostMapping("/register")
-    public CommonResult register(@RequestParam("username") String username, @RequestParam("password") String passwrod){
-        User user=new User();
-        user.setUsername(username);
-        user.setPassword(Sha1Cipher.encryptBySha1(passwrod));
-        userService.save(user);
-        return CommonResult.operateSuccess();
+    public CommonResult register(@Validated @RequestBody UserLoginDto authUserDto) {
+        System.out.println(authUserDto);
+        if (userService.checkNotExisted(authUserDto.getUsername())) {
+            userService.register(authUserDto);
+            return CommonResult.operateSuccess();
+        } else {
+            throw new BadRequestException("注册失败,用户名已存在");
+        }
     }
 
-    @RequestMapping("/login")
-    public CommonResult<UserLoginVo> login(@RequestParam("username") String username, @RequestParam("password") String passwrod) {
-        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(User::getUsername,username).eq(User::getPassword,Sha1Cipher.encryptBySha1(passwrod));
-        User user = userService.getOne(wrapper);
-        if (null==user){
-            return CommonResult.operateFailWithMessage("用户名或密码错误");
-        }
-        String token = tokenManager.generateToken(user);
-        return CommonResult.operateSuccess(new UserLoginVo(token));
+            /**
+             * 登录认证接口
+             *
+             * @param authUserDto 登录信息
+             * @return 统一返回结果
+             */
+    @PostMapping("/login")
+    public CommonResult authenticate(@Validated @RequestBody UserLoginDto authUserDto) {
+        //认证
+        Authentication authenticate = authenticateService.authenticate(authUserDto.getUsername(), authUserDto.getPassword());
+        //认证后生成令牌
+        String token = authenticateService.generateToken(authenticate);
+        Long uid = authenticateService.getUserId(authenticate);
+        String username=authenticateService.getUserName(authenticate);
+        authenticateService.singleLogin(token, authUserDto.getUsername());
+        List<Object> roles = authenticateService.getRole(authenticate);
+        UserLoginVo userLoginVo=new UserLoginVo();
+        userLoginVo.setToken(token);
+        userLoginVo.setUserVo(new UserVo(uid,username,roles));
+         return CommonResult.operateSuccess(userLoginVo);
     }
 }

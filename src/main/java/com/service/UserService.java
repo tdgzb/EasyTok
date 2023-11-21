@@ -1,7 +1,9 @@
 package com.service;
 
+import com.auth.dto.JwtUserDto;
 import com.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dto.UserLoginDto;
 
 /**
 * @author 22577
@@ -10,4 +12,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface UserService extends IService<User> {
 
+    boolean checkNotExisted(String username);
+
+    void register(UserLoginDto authUserDto);
 }
