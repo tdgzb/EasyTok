@@ -7,11 +7,15 @@ import com.auth.vo.UserVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.domain.User;
+import com.dto.UserInfoDto;
 import com.dto.UserLoginDto;
 import com.exception.BadRequestException;
+import com.model.vo.UserInfoVo;
 import com.result.CommonResult;
 import com.service.UserService;
+import com.utlis.AliOSSManager;
 import com.utlis.Sha1Cipher;
+import com.utlis.SpringSecurityUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +44,8 @@ public class UserController {
     private UserService userService;
     @Resource
     private AuthenticateService authenticateService;
+    @Resource
+    AliOSSManager aliOSSManager;
 
 
     /**
@@ -77,5 +84,20 @@ public class UserController {
         userLoginVo.setToken(token);
         userLoginVo.setUserVo(new UserVo(uid,username,roles));
          return CommonResult.operateSuccess(userLoginVo);
+    }
+
+
+
+    /**
+     * 查看个人信息
+     * @return
+     */
+    @GetMapping("/userInfo")
+    public CommonResult<UserInfoVo> getUserInfo(){
+        Long userId = SpringSecurityUtil.getUserId();
+        User user = userService.getById(userId);
+        UserInfoVo userInfoVo=new UserInfoVo();
+        BeanUtils.copyProperties(user,userInfoVo);
+        return CommonResult.operateSuccess(userInfoVo);
     }
 }

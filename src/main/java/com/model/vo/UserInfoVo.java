@@ -1,40 +1,27 @@
-package com.domain;
+package com.model.vo;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.io.Serializable;
-
 /**
- * 
- * @TableName user
+ * @Description:
+ * @DATE: 2023/12/4  21:12
+ * @Author: 2257736387@qq.com
+ * @Version: 1.0
  */
-@TableName(value ="user")
 @Data
-public class User implements Serializable {
-    /**
-     * id
-     */
-    @TableId
-    private Long id;
+public class UserInfoVo {
+
 
     /**
      * 用户名
      */
     private String username;
-
     /**
-     * 密码
+     * 头像路径
      */
-    private String password;
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
-
     private String imgUrl;
-
     /**
      * 个人简介
      */
