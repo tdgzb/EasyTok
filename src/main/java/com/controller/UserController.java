@@ -86,7 +86,23 @@ public class UserController {
          return CommonResult.operateSuccess(userLoginVo);
     }
 
-
+    /**
+     * 修改个人信息
+     * @param userInfoDto
+     * @return
+     * @throws IOException
+     */
+    @PutMapping("/modify")
+    public CommonResult modifyUserInfo(@RequestBody UserInfoDto userInfoDto) throws IOException {
+        String imgUrl = aliOSSManager.uploadFile(null, userInfoDto.getImg());
+        Long userId = SpringSecurityUtil.getUserId();
+        userInfoDto.setId(userId);
+        User user=new User();
+        BeanUtils.copyProperties(userInfoDto,user);
+        user.setImgUrl(imgUrl);
+        userService.updateById(user);
+        return CommonResult.operateSuccess();
+    }
 
     /**
      * 查看个人信息
