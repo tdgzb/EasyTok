@@ -46,12 +46,12 @@ public class AliOSSManager {
      * @param param 上传参数
      * @return
      */
-    public void uploadChunk(UploadChunkFileParam param) throws IOException {
+    public String uploadChunk(UploadChunkFileParam param) throws IOException {
 //        if (ObjectUtil.isEmpty(param.getKey())) {
 //            String key = getKey(null, param.getIdentifier(), param.getFilename());
 //            param.setKey(key);
 //        }
-        uploadChunk(param.getUploadId(), param.getKey(), param.getFile(), param.getChunkNumber(), param.getCurrentChunkSize(), param.getTotalChunks());
+      return uploadChunk(param.getUploadId(), param.getKey(), param.getFile(), param.getChunkNumber(), param.getCurrentChunkSize(), param.getTotalChunks());
     }
 
     /**
@@ -69,7 +69,7 @@ public class AliOSSManager {
      * @param chunkSize  分片大小
      * @return
      */
-    public void uploadChunk(String uploadId, String key, MultipartFile file, Integer chunkIndex,
+    public String uploadChunk(String uploadId, String key, MultipartFile file, Integer chunkIndex,
                             long chunkSize, Integer totalChunk) throws IOException {
 
         ossClient = initOSS();
@@ -102,7 +102,9 @@ public class AliOSSManager {
         System.out.println(redisUtil.get(RedisConstants.File_UPLOAP_COUNT + uploadId));
         if (redisUtil.get(RedisConstants.File_UPLOAP_COUNT + uploadId) == totalChunk) {
             uploadChunkComplete(uploadId, key, partETagList);
+            return key;
         }
+        return null;
     }
 
     /**
@@ -240,6 +242,7 @@ public class AliOSSManager {
      */
     public InputStream getInputStream(String key) {
         ossClient = initOSS();
+
         // 下载OSS文件到本地文件。如果指定的本地文件存在会覆盖，不存在则新建。
         return ossClient.getObject(new GetObjectRequest(aliOSSProperties.getBUCKET_NAME(), key)).getObjectContent();
     }
