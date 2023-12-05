@@ -30,6 +30,11 @@ public class VideoVo {
     private String author;
 
     /**
+     * 作者id
+     */
+    private Long userId;
+
+    /**
      *
      */
     private String fileName;

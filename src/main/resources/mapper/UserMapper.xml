@@ -14,4 +14,8 @@
     <sql id="Base_Column_List">
         id,username,password,img_url
     </sql>
+
+    <select id="selectUserName" resultType="string" parameterType="long">
+        select username from user where id=#{id}
+    </select>
 </mapper>

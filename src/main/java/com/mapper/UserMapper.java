@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @Entity com.domain.User
 */
 public interface UserMapper extends BaseMapper<User> {
-
+   String selectUserName(Long id);
 }
 
 

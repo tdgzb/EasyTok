@@ -6,27 +6,18 @@ import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.common.auth.DefaultCredentialProvider;
 import com.auth.dto.JwtUserDto;
 import com.constants.RedisConstants;
-import com.domain.Comment;
 import com.domain.Video;
-import com.dto.CommentDto;
-import com.dto.UploadChunkFileParam;
-import com.fasterxml.jackson.databind.util.BeanUtil;
+import com.mapper.UserMapper;
 import com.mapper.VideoMapper;
 import com.model.vo.VideoVo;
 import com.oss.AliOSSProperties;
 import com.result.CommonResult;
-import com.service.CommentService;
 import com.service.VideoService;
 import com.utlis.ConverterUtil;
 import com.utlis.RedisUtil;
 import com.utlis.SpringSecurityUtil;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import javax.annotation.Resource;
 import java.net.URL;
 import java.util.Date;
@@ -48,9 +39,9 @@ public class VideoController {
     @Resource
     VideoMapper videoMapper;
     @Resource
-    private CommentService commentService;
-    @Resource
     private RedisUtil redisUtil;
+    @Resource
+    private UserMapper userMapper;
     @GetMapping("/random")
     public CommonResult<List<VideoVo>> getVideoRandom() {
         //创建oss客户端
@@ -125,13 +116,20 @@ public class VideoController {
      */
     @GetMapping("/videoInfo/{videoId}")
     public CommonResult<VideoVo> getVideoInfo(@PathVariable("videoId") Long videoId) {
+        OSS ossClient = new OSSClient(aliOSSProperties.getEND_POINT(),
+                new DefaultCredentialProvider(aliOSSProperties.getACCESS_KEY_ID(), aliOSSProperties.getACCESS_KEY_SECRET()), new ClientConfiguration());
+        Date expiration = new Date(System.currentTimeMillis() + 100 * 100 * 24 * 3600L);
         Video video = videoServicel.getById(videoId);
         VideoVo videoVo=new VideoVo();
         BeanUtils.copyProperties(video,videoVo);
+        String username = userMapper.selectUserName(video.getUserId());
         Integer likeNum =(Integer) redisUtil.get(RedisConstants.VIDEO_LIKE_NUM + videoId);
         boolean isLike = redisUtil.isMember(RedisConstants.VIDEO_LIKE + videoId, SpringSecurityUtil.getUserId().toString());
         videoVo.setIsLike(isLike);
         videoVo.setLikesNum(likeNum);
+        videoVo.setAuthor(username);
+        URL url = ossClient.generatePresignedUrl(aliOSSProperties.getBUCKET_NAME(), video.getFileName(), expiration);
+        videoVo.setUrl(url.toString());
         return CommonResult.operateSuccess(videoVo);
     }
 

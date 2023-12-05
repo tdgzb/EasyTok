@@ -46,12 +46,12 @@ public class AliOSSManager {
      * @param param 上传参数
      * @return
      */
-    public String uploadChunk(UploadChunkFileParam param) throws IOException {
+    public void uploadChunk(UploadChunkFileParam param) throws IOException {
 //        if (ObjectUtil.isEmpty(param.getKey())) {
 //            String key = getKey(null, param.getIdentifier(), param.getFilename());
 //            param.setKey(key);
 //        }
-      return uploadChunk(param.getUploadId(), param.getKey(), param.getFile(), param.getChunkNumber(), param.getCurrentChunkSize(), param.getTotalChunks());
+      uploadChunk(param.getUploadId(), param.getKey(), param.getFile(), param.getChunkNumber(), param.getCurrentChunkSize(), param.getTotalChunks());
     }
 
     /**
@@ -69,7 +69,7 @@ public class AliOSSManager {
      * @param chunkSize  分片大小
      * @return
      */
-    public String uploadChunk(String uploadId, String key, MultipartFile file, Integer chunkIndex,
+    public void uploadChunk(String uploadId, String key, MultipartFile file, Integer chunkIndex,
                             long chunkSize, Integer totalChunk) throws IOException {
 
         ossClient = initOSS();
@@ -102,9 +102,8 @@ public class AliOSSManager {
         System.out.println(redisUtil.get(RedisConstants.File_UPLOAP_COUNT + uploadId));
         if (redisUtil.get(RedisConstants.File_UPLOAP_COUNT + uploadId) == totalChunk) {
             uploadChunkComplete(uploadId, key, partETagList);
-            return key;
         }
-        return null;
+
     }
 
     /**
@@ -309,7 +308,7 @@ public class AliOSSManager {
      * @param inputStream 输入流
      * @return
      */
-    private  String  putFile(String key, InputStream inputStream) {
+    public   String  putFile(String key, InputStream inputStream) {
         ossClient = initOSS();
 
         // 上传文件最大值 MB->bytes
