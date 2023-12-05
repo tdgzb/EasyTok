@@ -34,6 +34,5 @@ public class SpringSecurityUtil {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDto principal =  (JwtUserDto)authentication.getPrincipal();
         return principal.getUser().getId();
-
     }
 }

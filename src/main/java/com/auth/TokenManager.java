@@ -40,6 +40,14 @@ public class TokenManager {
         return generateToken(claims);
     }
 
+    public String generateToken(User user) {
+        Map<String, Object> claims = new HashMap<>(16);
+        //添加主体信息
+        claims.put("sub", user.getUsername());
+        claims.put("iat", new Date());
+        return generateToken(claims);
+    }
+
     /**
      * 根据声明生成令牌
      *

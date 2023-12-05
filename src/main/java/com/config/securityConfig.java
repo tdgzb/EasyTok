@@ -56,11 +56,12 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
 // 放行所有OPTIONS请求
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
 // 放行登录方法
-//                .antMatchers(HttpMethod.POST, "/user/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/user/login").permitAll()
 //                .antMatchers(HttpMethod.POST, "/user/register").permitAll()
 //                .antMatchers(HttpMethod.GET,"/video/random").permitAll()
                 .antMatchers(HttpMethod.POST,"/upload/upload").permitAll()
 // 其他请求都需要认证后才能访问
+//                .anyRequest().authenticated()
                 .anyRequest().permitAll()
 // 使用自定义的 accessDecisionManager
                 .and()

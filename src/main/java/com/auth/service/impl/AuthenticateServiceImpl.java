@@ -50,6 +50,7 @@ public class AuthenticateServiceImpl implements AuthenticateService {
                     new UsernamePasswordAuthenticationToken(username, password);
             //认证
             Authentication authenticate = authenticationManager.authenticate(authenticationToken);
+            System.out.println(authenticate);
             SecurityContextHolder.getContext().setAuthentication(authenticate);
             return authenticate;
         } catch (UsernameNotFoundException e) {
