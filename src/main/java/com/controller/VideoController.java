@@ -118,7 +118,22 @@ public class VideoController {
         return CommonResult.operateSuccess(videoVos);
     }
 
-
+    /**
+     * 获取视频信息
+     * @param videoId
+     * @return
+     */
+    @GetMapping("/videoInfo/{videoId}")
+    public CommonResult<VideoVo> getVideoInfo(@PathVariable("videoId") Long videoId) {
+        Video video = videoServicel.getById(videoId);
+        VideoVo videoVo=new VideoVo();
+        BeanUtils.copyProperties(video,videoVo);
+        Integer likeNum =(Integer) redisUtil.get(RedisConstants.VIDEO_LIKE_NUM + videoId);
+        boolean isLike = redisUtil.isMember(RedisConstants.VIDEO_LIKE + videoId, SpringSecurityUtil.getUserId().toString());
+        videoVo.setIsLike(isLike);
+        videoVo.setLikesNum(likeNum);
+        return CommonResult.operateSuccess(videoVo);
+    }
 
 
 }
